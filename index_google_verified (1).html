@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="f8oQQKXiXWkz1ZLNqrxqq-A1lGJQN293WVO-vUmqcqE" />
+    <title>Developer Tools - All in One</title>
+    <!-- FontAwesome 아이콘 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 완벽한 YAML 양방향 변환을 위한 js-yaml CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <!-- MD5 해시 계산을 위한 SparkMD5 CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.2/spark-md5.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #eaeaea;
+            --border-focus: #b0b0b0;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --accent-color: #111111;
+            --accent-hover: #333333;
+            --error-color: #d93838;
+            --success-color: #2e7d32;
+            --highlight-bg: #fff3cd;
+            --radius: 8px;
+            --transition: 0.15s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .view {
+            display: none;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .main-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .main-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto 35px auto;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+            background: #fafafa;
+        }
+
+        .search-container input:focus {
+            border-color: var(--border-focus);
+            background: #ffffff;
+        }
+
+        section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .recent-section {
+            margin-bottom: 35px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .tool-card:hover {
+            border-color: var(--border-focus);
+            transform: translateY(-2px);
+        }
+
+        .tool-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .tool-card-header i {
+            font-size: 1.25rem;
+            color: var(--text-main);
+        }
+
+        .tool-card-header h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .tool-card p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .tool-card button {
+            background: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .tool-card button:hover {
+            background: var(--accent-hover);
+        }
+
+        .tool-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: #f5f5f5;
+            border-color: var(--border-focus);
+        }
+
+        .tool-nav h2 {
+            font-size: 1.35rem;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tool-content-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pane {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pane-full {
+            grid-column: 1 / -1;
+        }
+
+        .pane label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        textarea, input[type="text"], select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-family: monospace;
+            outline: none;
+            transition: var(--transition);
+            background: #fafafa;
+        }
+
+        textarea:focus, input[type="text"]:focus, select:focus {
+            border-color: var(--border-focus);
+            background: #ffffff;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 180px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+            border-color: var(--border-focus);
+        }
+
+        .error-msg {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .tool-guide {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .tool-guide h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .tool-guide p, .tool-guide ul {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .tool-guide ul {
+            padding-left: 20px;
+            margin-top: 6px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #111111;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .inline-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-preview-box {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .no-result {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px;
+            grid-column: 1 / -1;
+        }
+
+        .group-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 홈 화면 -->
+        <div id="home-view" class="view active">
+            <header class="main-header">
+                <h1>Developer Tools</h1>
+                <p>개발자를 위한 빠르고 안전한 브라우저 기반 유틸리티 모음</p>
+            </header>
+
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="tool-search" placeholder="도구 이름 검색 (예: JSON, Base64, UUID...)">
+            </div>
+
+            <section id="recent-section" class="recent-section" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px;">
+                    <h2 style="border: none; margin: 0; padding: 0;">최근 사용한 도구</h2>
+                    <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem;" onclick="clearRecentTools()">기록 삭제</button>
+                </div>
+                <div id="recent-grid" class="tools-grid"></div>
+            </section>
+
+            <section class="all-tools-section">
+                <h2>모든 도구</h2>
+                <div id="tools-grid" class="tools-grid"></div>
+            </section>
+        </div>
+
+        <!-- 도구 상세 화면 -->
+        <div id="tool-view" class="view">
+            <nav class="tool-nav">
+                <button id="back-btn" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <h2 id="current-tool-title">도구 이름</h2>
+            </nav>
+
+            <div class="tool-content-container">
+                <div id="tool-component-container"></div>
+                <div class="tool-guide">
+                    <h3>사용법 및 예제</h3>
+                    <div id="tool-guide-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Copied!</div>
+
+    <script>
+        const tools = [
+            { id: 'json-formatter', name: 'JSON Formatter', desc: 'JSON 데이터 정렬, Minify, 유효성 검사 및 오류 탐지', icon: 'fa-file-code' },
+            { id: 'json-yaml', name: 'JSON ↔ YAML Converter', desc: 'JSON과 YAML 형식 간 상호 양방향 변환 도구', icon: 'fa-exchange-alt' },
+            { id: 'base64', name: 'Base64 Encoder / Decoder', desc: 'UTF-8 한글을 지원하는 안전한 Base64 인코더/디코더', icon: 'fa-font' },
+            { id: 'url-codec', name: 'URL Encoder / Decoder', desc: '한글 및 특수문자 포함 URL 문자열 인코딩 및 디코딩', icon: 'fa-link' },
+            { id: 'uuid', name: 'UUID Generator', desc: '암호학적으로 안전한 고유 식별자(UUID v4) 생성', icon: 'fa-fingerprint' },
+            { id: 'hash', name: 'Hash Generator', desc: 'MD5, SHA-1, SHA-256, SHA-512 해시값 실시간 계산', icon: 'fa-hashtag' },
+            { id: 'timestamp', name: 'Timestamp Converter', desc: '초/밀리초 Unix Timestamp와 표준 날짜 상호 변환', icon: 'fa-clock' },
+            { id: 'color', name: 'Color Converter', desc: 'HEX, RGB, HSL 색상 코드 완벽 상호 변환 및 미리보기', icon: 'fa-palette' },
+            { id: 'regex', name: 'Regex Tester', desc: '정규표현식 실시간 매칭 검증 및 하이라이트/그룹 추출', icon: 'fa-search' },
+            { id: 'jwt', name: 'JWT Decoder', desc: 'JSON Web Token의 Header, Payload, Signature 분리 분석', icon: 'fa-shield-halved' }
+        ];
+
+        let currentToolId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initHome();
+            setupSearch();
+            setupNavigation();
+        });
+
+        function showToast(message = 'Copied!') {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1500);
+        }
+
+        function copyTextToClipboard(text, successMsg = 'Copied!', failMsg = 'Copy failed') {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(successMsg);
+                }).catch(() => {
+                    fallbackCopyText(text, successMsg, failMsg);
+                });
+            } else {
+                fallbackCopyText(text, successMsg, failMsg);
+            }
+        }
+
+        function fallbackCopyText(text, successMsg, failMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(successMsg);
+                } else {
+                    showToast(failMsg);
+                }
+            } catch (err) {
+                showToast(failMsg);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function initHome() {
+            renderToolsGrid('tools-grid', tools);
+            renderRecentTools();
+        }
+
+        function renderToolsGrid(containerId, list) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            if (list.length === 0) {
+                container.innerHTML = `<div class="no-result">No tools found</div>`;
+                return;
+            }
+            list.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'tool-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="tool-card-header">
+                            <i class="fa-solid ${tool.icon}"></i>
+                            <h3>${tool.name}</h3>
+                        </div>
+                        <p>${tool.desc}</p>
+                    </div>
+                    <button onclick="openTool('${tool.id}')">사용하기</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('tool-search');
+            if (!searchInput) return;
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                const filtered = tools.filter(t => t.name.toLowerCase().includes(query) || t.desc.toLowerCase().includes(query));
+                renderToolsGrid('tools-grid', filtered);
+            });
+        }
+
+        function getRecentTools() {
+            try { 
+                return JSON.parse(localStorage.getItem('recent_tools')) || []; 
+            } catch { 
+                return []; 
+            }
+        }
+
+        function addRecentTool(toolId) {
+            try {
+                let recent = getRecentTools();
+                recent = recent.filter(id => id !== toolId);
+                recent.unshift(toolId);
+                if (recent.length > 4) recent.pop();
+                localStorage.setItem('recent_tools', JSON.stringify(recent));
+            } catch (e) {}
+        }
+
+        function clearRecentTools() {
+            try {
+                localStorage.removeItem('recent_tools');
+            } catch (e) {}
+            renderRecentTools();
+        }
+
+        function renderRecentTools() {
+            const recentIds = getRecentTools();
+            const section = document.getElementById('recent-section');
+            if (!section) return;
+            if (recentIds.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+            const recentList = recentIds.map(id => tools.find(t => t.id === id)).filter(Boolean);
+            renderToolsGrid('recent-grid', recentList);
+        }
+
+        function setupNavigation() {
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
+                    switchView('home-view');
+                    initHome();
+                });
+            }
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById(viewId);
+            if (target) target.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function openTool(toolId) {
+            currentToolId = toolId;
+            addRecentTool(toolId);
+            const tool = tools.find(t => t.id === toolId);
+            if (!tool) return;
+
+            const titleEl = document.getElementById('current-tool-title');
+            if (titleEl) titleEl.textContent = tool.name;
+            renderToolUI(toolId);
+            switchView('tool-view');
+        }
+
+        function renderToolUI(toolId) {
+            const container = document.getElementById('tool-component-container');
+            const guideContainer = document.getElementById('tool-guide-content');
+            if (!container || !guideContainer) return;
+            container.innerHTML = '';
+            guideContainer.innerHTML = '';
+
+            switch(toolId) {
+                case 'json-formatter':
+                    container.innerHTML = `
+                        <div class="workspace">
+                            <div class="pane">
+                                <label>Input JSON <span id="json-err" class="error-msg"></span></label>
+                                <textarea id="json-input" placeholder="여기에 JSON 데이터를 입력하세요..." oninput="handleJSONInput()"></textarea>
+                                <div class="btn-group">
+                                    <button class="btn" onclick="formatJSON(2)">Pretty (2칸)</button>
+                                    <button class="btn btn-secondary" onclick="formatJSON(4)">Pretty (4칸)</button>
+                                    <button class="btn btn-secondary" onclick="minifyJSON()">Minify</button>
+                                    <button class="btn btn-secondary" onclick="clearJSON()">Clear</button>
+                                </div>
+                            </div>
+                            <div class="pane">
+                                <label>Result <button class="btn btn-secondary" style="padding:2px 8px; font-size:0.75rem;" onclick="copyOutput('json-output')">Copy</button></label>
+                                <textarea id="json-output" readonly placeholder="결과가 여기에 표시됩니다..."></textarea>
+                                <div class="btn-group">
+                                    <button class="btn btn-secondary" onclick="downloadOutput('json-output', 'formatted.json')">Download</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>JSON 문자열을 정렬하거나 압축하고 유효성을 검증합니다.</p><ul><li>예시: <code>{"name":"test","number":123}</code></li></ul>`;
+                    break;
+
+                case 'json-yaml':
+                    container.innerHTML = `
+                        <div class="workspace">
+                            <div class="pane">
+                                <label>JSON Input <span id="jy-err" class="error-msg"></span></label>
+                                <textarea id="jy-json-input" placeholder="JSON 입력..." oninput="handleYAMLInputClear()"></textarea>
+                                <div class="btn-group">
+                                    <button class="btn" onclick="convertJsonToYaml()">JSON → YAML 변환</button>
+                                    <button class="btn btn-secondary" onclick="clearJSONYAML()">Clear</button>
+                                </div>
+                            </div>
+                            <div class="pane">
+                                <label>YAML Input / Output <button class="btn btn-secondary" style="padding:2px 8px; font-size:0.75rem;" onclick="copyOutput('jy-yaml-output')">Copy</button></label>
+                                <textarea id="jy-yaml-output" placeholder="YAML 입력 또는 결과..." oninput="handleYAMLInputClear()"></textarea>
+                                <div class="btn-group">
+                                    <button class="btn" onclick="convertYamlToJson()">YAML → JSON 변환</button>
+                                    <button class="btn btn-secondary" onclick="downloadOutput('jy-yaml-output', 'converted.yaml')">Download</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>JSON과 YAML 간 양방향 변환을 지원합니다. (js-yaml 엔진 활용)</p>`;
+                    break;
+
+                case 'base64':
+                    container.innerHTML = `
+                        <div class="workspace">
+                            <div class="pane">
+                                <label>Input Text <span id="b64-err" class="error-msg"></span></label>
+                                <textarea id="b64-input" placeholder="텍스트 또는 Base64 입력..."></textarea>
+                                <div class="btn-group">
+                                    <button class="btn" onclick="encodeBase64()">Encode</button>
+                                    <button class="btn btn-secondary" onclick="decodeBase64()">Decode</button>
+                                    <button class="btn btn-secondary" onclick="document.getElementById('b64-input').value=''; document.getElementById('b64-output').value=''; document.getElementById('b64-err').textContent='';">Clear</button>
+                                </div>
+                            </div>
+                            <div class="pane">
+                                <label>Result <button class="btn btn-secondary" style="padding:2px 8px; font-size:0.75rem;" onclick="copyOutput('b64-output')">Copy</button></label>
+                                <textarea id="b64-output" readonly placeholder="결과..."></textarea>
+                                <div class="btn-group">
+                                    <button class="btn btn-secondary" onclick="downloadOutput('b64-output', 'result.txt')">Download</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>UTF-8 한글 및 특수문자가 깨지지 않는 안전한 Base64 인코더/디코더입니다.</p>`;
+                    break;
+
+                case 'url-codec':
+                    container.innerHTML = `
+                        <div class="workspace">
+                            <div class="pane">
+                                <label>Input String <span id="url-err" class="error-msg"></span></label>
+                                <textarea id="url-input" placeholder="문자열 입력..."></textarea>
+                                <div class="btn-group">
+                                    <button class="btn" onclick="encodeURL()">URL Encode</button>
+                                    <button class="btn btn-secondary" onclick="decodeURL()">URL Decode</button>
+                                    <button class="btn btn-secondary" onclick="document.getElementById('url-input').value=''; document.getElementById('url-output').value=''; document.getElementById('url-err').textContent='';">Clear</button>
+                                </div>
+                            </div>
+                            <div class="pane">
+                                <label>Result <button class="btn btn-secondary" style="padding:2px 8px; font-size:0.75rem;" onclick="copyOutput('url-output')">Copy</button></label>
+                                <textarea id="url-output" readonly placeholder="결과..."></textarea>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>예: <code>안녕하세요 world</code> → <code>%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94%20world</code></p>`;
+                    break;
+
+                case 'uuid':
+                    container.innerHTML = `
+                        <div class="workspace pane-full">
+                            <div class="pane">
+                                <label>UUID v4 Generator</label>
+                                <div class="inline-controls">
+                                    <span>생성 개수: </span>
+                                    <select id="uuid-count" style="width: 100px;">
+                                        <option value="1">1개</option>
+                                        <option value="5">5개</option>
+                                        <option value="10" selected>10개</option>
+                                        <option value="50">50개</option>
+                                    </select>
+                                    <button class="btn" onclick="generateUUIDs()">생성하기</button>
+                                    <button class="btn btn-secondary" onclick="copyOutput('uuid-output')">전체 복사</button>
+                                    <button class="btn btn-secondary" onclick="document.getElementById('uuid-output').value='';">Clear</button>
+                                </div>
+                                <textarea id="uuid-output" readonly placeholder="생성된 UUID가 여기에 표시됩니다..." style="min-height: 250px;"></textarea>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>암호학적 API(<code>crypto.randomUUID</code> 또는 <code>crypto.getRandomValues</code>)를 사용하여 규격에 맞는 UUID v4를 생성합니다.</p>`;
+                    break;
+
+                case 'hash':
+                    container.innerHTML = `
+                        <div class="workspace pane-full">
+                            <div class="pane">
+                                <label>Input Text</label>
+                                <textarea id="hash-input" placeholder="해시값을 생성할 텍스트를 입력하세요..." oninput="computeHashes()"></textarea>
+                                <div class="btn-group">
+                                    <button class="btn btn-secondary" onclick="document.getElementById('hash-input').value=''; computeHashes();">Clear</button>
+                                </div>
+                            </div>
+                            <div class="pane" style="gap:15px; margin-top:10px;">
+                                <div><label>MD5 <span id="err-md5" class="error-msg" style="float:right;"></span></label><div style="display:flex; gap:8px;"><input type="text" id="hash-md5" readonly><button class="btn btn-secondary" onclick="copyField('hash-md5')">Copy</button></div></div>
+                                <div><label>SHA-1 <span id="err-sha1" class="error-msg" style="float:right;"></span></label><div style="display:flex; gap:8px;"><input type="text" id="hash-sha1" readonly><button class="btn btn-secondary" onclick="copyField('hash-sha1')">Copy</button></div></div>
+                                <div><label>SHA-256 <span id="err-sha256" class="error-msg" style="float:right;"></span></label><div style="display:flex; gap:8px;"><input type="text" id="hash-sha256" readonly><button class="btn btn-secondary" onclick="copyField('hash-sha256')">Copy</button></div></div>
+                                <div><label>SHA-512 <span id="err-sha512" class="error-msg" style="float:right;"></span></label><div style="display:flex; gap:8px;"><input type="text" id="hash-sha512" readonly><button class="btn btn-secondary" onclick="copyField('hash-sha512')">Copy</button></div></div>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>MD5 및 Web Crypto API 기반 SHA 해시값을 실시간으로 계산하며, 개별 알고리즘 오류 시 상세 메시지를 표시합니다.</p>`;
+                    break;
+
+                case 'timestamp':
+                    container.innerHTML = `
+                        <div class="workspace pane-full">
+                            <div class="pane" style="background:#fafafa; padding:15px; border-radius:8px; border:1px solid var(--border-color);">
+                                <label>현재 시간 Timestamp</label>
+                                <div style="display:flex; gap:10px; align-items:center; margin-top:5px;">
+                                    <input type="text" id="current-ts" readonly style="font-weight:bold;">
+                                    <button class="btn" onclick="copyField('current-ts')">복사</button>
+                                </div>
+                            </div>
+                            <div class="workspace" style="margin-top:15px;">
+                                <div class="pane">
+                                    <label>Timestamp → Date <span id="ts-err" class="error-msg"></span></label>
+                                    <div class="inline-controls" style="margin-bottom:6px;">
+                                        <label style="font-weight:normal; font-size:0.85rem;"><input type="radio" name="ts-unit" value="sec" checked onchange="convertTimestampToDate()"> 초(sec)</label>
+                                        <label style="font-weight:normal; font-size:0.85rem;"><input type="radio" name="ts-unit" value="ms" onchange="convertTimestampToDate()"> 밀리초(ms)</label>
+                                    </div>
+                                    <input type="text" id="ts-input" placeholder="예: 1710000000" oninput="convertTimestampToDate()">
+                                    <input type="text" id="ts-result-date" readonly placeholder="결과 날짜..." style="margin-top:8px;">
+                                </div>
+                                <div class="pane">
+                                    <label>Date → Timestamp <span id="date-err" class="error-msg"></span></label>
+                                    <div class="inline-controls" style="margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">
+                                        <span>형식: 연-월-일 시:분:초 (UTC 기준)</span>
+                                    </div>
+                                    <input type="text" id="date-input" placeholder="YYYY-MM-DD HH:mm:ss" oninput="convertDateToTimestamp()">
+                                    <div class="btn-group" style="margin-top:8px;">
+                                        <button class="btn" onclick="setNowDate()">현재 시간 입력</button>
+                                    </div>
+                                    <input type="text" id="date-result-ts" readonly placeholder="결과 Timestamp..." style="margin-top:8px;">
+                                </div>
+                            </div>
+                        </div>`;
+                    initTimestampClock();
+                    guideContainer.innerHTML = `<p>존재하지 않는 날짜를 엄격히 차단하여 유닉스 타임스탬프와 날짜를 상호 변환합니다.</p>`;
+                    break;
+
+                case 'color':
+                    container.innerHTML = `
+                        <div class="workspace pane-full">
+                            <div class="pane">
+                                <label>색상 변환 및 미리보기 <span id="color-preview" class="color-preview-box" style="background-color: #ffffff;"></span> <span id="color-err" class="error-msg"></span></label>
+                                <div class="workspace" style="margin-top:10px;">
+                                    <div class="pane"><label>HEX <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.7rem;" onclick="copyField('col-hex')">Copy</button></label><input type="text" id="col-hex" value="#FFFFFF" oninput="updateColors('hex')"></div>
+                                    <div class="pane"><label>RGB <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.7rem;" onclick="copyField('col-rgb')">Copy</button></label><input type="text" id="col-rgb" value="rgb(255, 255, 255)" oninput="updateColors('rgb')"></div>
+                                    <div class="pane pane-full"><label>HSL <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.7rem;" onclick="copyField('col-hsl')">Copy</button></label><input type="text" id="col-hsl" value="hsl(0, 0%, 100%)" oninput="updateColors('hsl')"></div>
+                                </div>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>HEX, RGB, HSL 코드를 엄격히 검증하여 상호 변환합니다.</p>`;
+                    break;
+
+                case 'regex':
+                    container.innerHTML = `
+                        <div class="workspace pane-full">
+                            <div class="workspace">
+                                <div class="pane">
+                                    <label>Regular Expression <span id="regex-err" class="error-msg"></span></label>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="text" id="regex-pattern" placeholder="예: cat" oninput="runRegex()">
+                                        <input type="text" id="regex-flags" value="g" placeholder="flags" style="width:80px;" oninput="runRegex()">
+                                    </div>
+                                </div>
+                                <div class="pane"><label>Match 통계</label><input type="text" id="regex-stats" readonly placeholder="매칭된 갯수..."></div>
+                            </div>
+                            <div class="pane" style="margin-top:15px;"><label>Test String</label><textarea id="regex-string" placeholder="테스트할 문자열 입력..." oninput="runRegex()"></textarea></div>
+                            <div class="pane" style="margin-top:15px;">
+                                <label>Match 결과 강조 표시 (XSS Safe)</label>
+                                <div id="regex-output" style="padding:10px; border:1px solid var(--border-color); border-radius:var(--radius); min-height:80px; background:#fafafa; font-family:monospace; white-space:pre-wrap; word-break:break-all;"></div>
+                            </div>
+                            <div class="pane" style="margin-top:15px;">
+                                <label>Capture Groups 상세 정보</label>
+                                <div id="regex-groups-container" style="display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto;">
+                                    <div style="color:var(--text-muted); font-size:0.85rem;">매칭 결과가 여기에 그룹별로 표시됩니다.</div>
+                                </div>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>사용자가 입력한 플래그를 그대로 적용하며, DOM API로 XSS를 방지합니다.</p>`;
+                    break;
+
+                case 'jwt':
+                    container.innerHTML = `
+                        <div class="workspace pane-full">
+                            <div class="pane">
+                                <label>JWT Token Input <span id="jwt-err" class="error-msg"></span></label>
+                                <textarea id="jwt-input" placeholder="eyJhG... (HEADER.PAYLOAD.SIGNATURE 토큰 입력)" oninput="decodeJWT()"></textarea>
+                                <div class="btn-group"><button class="btn btn-secondary" onclick="document.getElementById('jwt-input').value=''; decodeJWT();">Clear</button></div>
+                            </div>
+                            <div class="workspace" style="margin-top:15px;">
+                                <div class="pane"><label>Header <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.7rem;" onclick="copyOutput('jwt-header')">Copy</button></label><textarea id="jwt-header" readonly placeholder="Header..."></textarea></div>
+                                <div class="pane"><label>Payload <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.7rem;" onclick="copyOutput('jwt-payload')">Copy</button></label><textarea id="jwt-payload" readonly placeholder="Payload..."></textarea></div>
+                                <div class="pane pane-full"><label>Signature <span id="jwt-sig-status" style="font-weight:normal; color:var(--text-muted); font-size:0.8rem;">(not verified)</span></label><input type="text" id="jwt-signature" readonly placeholder="Signature 파트..." style="font-size:0.8rem;"></div>
+                            </div>
+                        </div>`;
+                    guideContainer.innerHTML = `<p>정확히 3개 파트 구성 및 Base64URL 유효 문자 검증을 수행합니다.</p>`;
+                    break;
+            }
+        }
+
+        function handleJSONInput() {
+            const input = document.getElementById('json-input').value;
+            const outputEl = document.getElementById('json-output');
+            const errEl = document.getElementById('json-err');
+            if (!input.trim()) {
+                if (outputEl) outputEl.value = '';
+                if (errEl) errEl.textContent = '';
+            }
+        }
+
+        function formatJSON(indent) {
+            const input = document.getElementById('json-input').value;
+            const errEl = document.getElementById('json-err');
+            const outputEl = document.getElementById('json-output');
+            if (!errEl || !outputEl) return;
+            errEl.textContent = '';
+            if (!input.trim()) { 
+                outputEl.value = ''; 
+                return; 
+            }
+            try {
+                let parsed = JSON.parse(input);
+                outputEl.value = JSON.stringify(parsed, null, indent);
+            } catch (e) { 
+                errEl.textContent = 'Invalid JSON: ' + e.message; 
+                outputEl.value = '';
+            }
+        }
+
+        function minifyJSON() {
+            const input = document.getElementById('json-input').value;
+            const errEl = document.getElementById('json-err');
+            const outputEl = document.getElementById('json-output');
+            if (!errEl || !outputEl) return;
+            errEl.textContent = '';
+            if (!input.trim()) {
+                outputEl.value = '';
+                return;
+            }
+            try {
+                let parsed = JSON.parse(input);
+                outputEl.value = JSON.stringify(parsed);
+            } catch (e) { 
+                errEl.textContent = 'Invalid JSON: ' + e.message; 
+                outputEl.value = '';
+            }
+        }
+
+        function clearJSON() {
+            const inEl = document.getElementById('json-input');
+            const outEl = document.getElementById('json-output');
+            const errEl = document.getElementById('json-err');
+            if (inEl) inEl.value = '';
+            if (outEl) outEl.value = '';
+            if (errEl) errEl.textContent = '';
+        }
+
+        function handleYAMLInputClear() {
+            const jsonIn = document.getElementById('jy-json-input');
+            const yamlOut = document.getElementById('jy-yaml-output');
+            const errEl = document.getElementById('jy-err');
+            if (!jsonIn || !yamlOut) return;
+            if (!jsonIn.value.trim() && !yamlOut.value.trim()) {
+                if (errEl) errEl.textContent = '';
+            }
+        }
+
+        function clearJSONYAML() {
+            const jsonIn = document.getElementById('jy-json-input');
+            const yamlOut = document.getElementById('jy-yaml-output');
+            const errEl = document.getElementById('jy-err');
+            if (jsonIn) jsonIn.value = '';
+            if (yamlOut) yamlOut.value = '';
+            if (errEl) errEl.textContent = '';
+        }
+
+        function convertJsonToYaml() {
+            const input = document.getElementById('jy-json-input').value;
+            const errEl = document.getElementById('jy-err');
+            const yamlOut = document.getElementById('jy-yaml-output');
+            if (!errEl || !yamlOut) return;
+            errEl.textContent = '';
+            if(!input.trim()) {
+                yamlOut.value = '';
+                return;
+            }
+            if(typeof jsyaml === 'undefined') { 
+                errEl.textContent = 'YAML library unavailable'; 
+                return; 
+            }
+            try {
+                const obj = JSON.parse(input);
+                yamlOut.value = jsyaml.dump(obj);
+            } catch(e) { 
+                errEl.textContent = 'Invalid JSON: ' + e.message; 
+                yamlOut.value = '';
+            }
+        }
+
+        function convertYamlToJson() {
+            const input = document.getElementById('jy-yaml-output').value;
+            const errEl = document.getElementById('jy-err');
+            const jsonIn = document.getElementById('jy-json-input');
+            if (!errEl || !jsonIn) return;
+            errEl.textContent = '';
+            if(!input.trim()) {
+                jsonIn.value = '';
+                return;
+            }
+            if(typeof jsyaml === 'undefined') { 
+                errEl.textContent = 'YAML library unavailable'; 
+                return; 
+            }
+            try {
+                const obj = jsyaml.load(input);
+                jsonIn.value = JSON.stringify(obj, null, 2);
+            } catch(e) { 
+                errEl.textContent = 'Invalid YAML: ' + e.message; 
+                jsonIn.value = '';
+            }
+        }
+
+        function encodeBase64() {
+            const val = document.getElementById('b64-input').value;
+            const errEl = document.getElementById('b64-err');
+            const outEl = document.getElementById('b64-output');
+            if (!errEl || !outEl) return;
+            errEl.textContent = '';
+            if (!val.trim()) {
+                outEl.value = '';
+                return;
+            }
+            try {
+                const utf8Bytes = new TextEncoder().encode(val);
+                let binaryString = '';
+                utf8Bytes.forEach(b => binaryString += String.fromCharCode(b));
+                outEl.value = btoa(binaryString);
+            } catch(e) { 
+                errEl.textContent = '인코딩 실패'; 
+                outEl.value = '';
+            }
+        }
+
+        function decodeBase64() {
+            const val = document.getElementById('b64-input').value.trim();
+            const errEl = document.getElementById('b64-err');
+            const outEl = document.getElementById('b64-output');
+            if (!errEl || !outEl) return;
+            errEl.textContent = '';
+            if (!val) { outEl.value = ''; return; }
+            
+            const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+            if (!base64Regex.test(val)) {
+                errEl.textContent = 'Invalid Base64 format (문자열 또는 패딩/특수문자 오류)';
+                outEl.value = '';
+                return;
+            }
+
+            try {
+                const binaryString = atob(val);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                outEl.value = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+            } catch(e) { 
+                errEl.textContent = 'Invalid Base64 decoding or invalid UTF-8 sequence: ' + e.message; 
+                outEl.value = '';
+            }
+        }
+
+        function encodeURL() {
+            const errEl = document.getElementById('url-err');
+            const inEl = document.getElementById('url-input');
+            const outEl = document.getElementById('url-output');
+            if(!inEl || !outEl) return;
+            try {
+                outEl.value = encodeURIComponent(inEl.value);
+                if(errEl) errEl.textContent = '';
+            } catch(e) { 
+                if(errEl) errEl.textContent = '인코딩 오류'; 
+                outEl.value = '';
+            }
+        }
+
+        function decodeURL() {
+            const errEl = document.getElementById('url-err');
+            const inEl = document.getElementById('url-input');
+            const outEl = document.getElementById('url-output');
+            if(!inEl || !outEl) return;
+            try {
+                outEl.value = decodeURIComponent(inEl.value);
+                if(errEl) errEl.textContent = '';
+            } catch(e) { 
+                if(errEl) errEl.textContent = 'Invalid URL encoded string'; 
+                outEl.value = '';
+            }
+        }
+
+        function generateUUIDv4() {
+            if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                return crypto.randomUUID();
+            }
+            if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+                const buf = new Uint8Array(16);
+                crypto.getRandomValues(buf);
+                buf[6] = (buf[6] & 0x0f) | 0x40;
+                buf[8] = (buf[8] & 0x3f) | 0x80;
+                const hex = Array.from(buf, b => b.toString(16).padStart(2, '0')).join('');
+                return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+            }
+            throw new Error('Cryptographic random source is not available');
+        }
+
+        function generateUUIDs() {
+            const countEl = document.getElementById('uuid-count');
+            const outEl = document.getElementById('uuid-output');
+            if(!countEl || !outEl) return;
+            const count = parseInt(countEl.value, 10);
+            let uuids = [];
+            try {
+                for(let i=0; i<count; i++) {
+                    uuids.push(generateUUIDv4());
+                }
+                outEl.value = uuids.join('\n');
+            } catch(e) {
+                outEl.value = 'Error: ' + e.message;
+            }
+        }
+
+        let hashRequestId = 0;
+
+        async function computeHashes() {
+            const currentReqId = ++hashRequestId;
+            const inputEl = document.getElementById('hash-input');
+            if (!inputEl) return;
+            const text = inputEl.value;
+            const data = new TextEncoder().encode(text);
+            
+            ['md5', 'sha1', 'sha256', 'sha512'].forEach(k => {
+                const errEl = document.getElementById(`err-${k}`);
+                if (errEl) errEl.textContent = '';
+            });
+
+            if (!text) {
+                if (currentReqId !== hashRequestId) return;
+                ['md5', 'sha1', 'sha256', 'sha512'].forEach(k => {
+                    const field = document.getElementById(`hash-${k}`);
+                    if (field) field.value = '';
+                });
+                return;
+            }
+
+            try {
+                const md5Field = document.getElementById('hash-md5');
+                if (typeof SparkMD5 !== 'undefined') {
+                    if (currentReqId !== hashRequestId) return;
+                    if (md5Field) md5Field.value = SparkMD5.hash(text);
+                } else {
+                    if (currentReqId !== hashRequestId) return;
+                    if (md5Field) md5Field.value = '';
+                    const errMd5 = document.getElementById('err-md5');
+                    if (errMd5) errMd5.textContent = 'MD5 library unavailable';
+                }
+            } catch(e) {
+                if (currentReqId !== hashRequestId) return;
+                const md5Field = document.getElementById('hash-md5');
+                if (md5Field) md5Field.value = '';
+                const errMd5 = document.getElementById('err-md5');
+                if (errMd5) errMd5.textContent = 'Hash generation failed';
+            }
+
+            const shaAlgos = [
+                { key: 'sha1', algo: 'SHA-1' },
+                { key: 'sha256', algo: 'SHA-256' },
+                { key: 'sha512', algo: 'SHA-512' }
+            ];
+
+            for (let item of shaAlgos) {
+                try {
+                    const field = document.getElementById(`hash-${item.key}`);
+                    if (typeof crypto !== 'undefined' && crypto && typeof crypto.subtle !== 'undefined') {
+                        const buf = await crypto.subtle.digest(item.algo, data);
+                        if (currentReqId !== hashRequestId) return;
+                        if (field) field.value = bufferToHex(buf);
+                    } else {
+                        throw new Error('SubtleCrypto not available');
+                    }
+                } catch(e) {
+                    if (currentReqId !== hashRequestId) return;
+                    const field = document.getElementById(`hash-${item.key}`);
+                    if (field) field.value = '';
+                    const errField = document.getElementById(`err-${item.key}`);
+                    if (errField) errField.textContent = 'Hash generation failed';
+                }
+            }
+        }
+
+        function bufferToHex(buffer) {
+            return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        let clockInterval = null;
+        function initTimestampClock() {
+            if(clockInterval) clearInterval(clockInterval);
+            const update = () => { 
+                const el = document.getElementById('current-ts'); 
+                if(el) el.value = Math.floor(Date.now() / 1000); 
+            };
+            update();
+            clockInterval = setInterval(update, 1000);
+        }
+
+        function convertTimestampToDate() {
+            const inputEl = document.getElementById('ts-input');
+            const errEl = document.getElementById('ts-err');
+            const resultEl = document.getElementById('ts-result-date');
+            if(!inputEl || !errEl || !resultEl) return;
+
+            let val = inputEl.value.trim();
+            errEl.textContent = '';
+            if(!val) { resultEl.value = ''; return; }
+            if (val.toLowerCase() === 'nan' || val === 'Infinity' || val === '-Infinity') {
+                errEl.textContent = '유효하지 않은 숫자 범위입니다.';
+                resultEl.value = '';
+                return;
+            }
+            let num = Number(val);
+            if(!Number.isFinite(num)) { 
+                errEl.textContent = '유효하지 않은 숫자 범위입니다.'; 
+                resultEl.value = ''; 
+                return; 
+            }
+            const unitEl = document.querySelector('input[name="ts-unit"]:checked');
+            const unit = unitEl ? unitEl.value : 'sec';
+            if(unit === 'sec') num *= 1000;
+
+            if(Math.abs(num) > 8640000000000000) {
+                errEl.textContent = 'JavaScript Date 범위를 벗어난 값입니다.';
+                resultEl.value = '';
+                return;
+            }
+            let date = new Date(num);
+            if(isNaN(date.getTime())) {
+                resultEl.value = '유효하지 않은 타임스탬프';
+                return;
+            }
+            const yyyy = date.getUTCFullYear();
+            const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(date.getUTCDate()).padStart(2, '0');
+            const hh = String(date.getUTCHours()).padStart(2, '0');
+            const min = String(date.getUTCMinutes()).padStart(2, '0');
+            const ss = String(date.getUTCSeconds()).padStart(2, '0');
+            resultEl.value = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss} UTC`;
+        }
+
+        function convertDateToTimestamp() {
+            const inputEl = document.getElementById('date-input');
+            const errEl = document.getElementById('date-err');
+            const resultEl = document.getElementById('date-result-ts');
+            if(!inputEl || !errEl || !resultEl) return;
+
+            let val = inputEl.value.trim();
+            errEl.textContent = '';
+            if(!val) { resultEl.value = ''; return; }
+            
+            const regex = /^(\d{1,4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})$/;
+            const match = val.match(regex);
+            if (!match) {
+                errEl.textContent = '형식 오류: YYYY-MM-DD HH:mm:ss 필요';
+                resultEl.value = '';
+                return;
+            }
+            
+            const year = parseInt(match[1], 10);
+            const month = parseInt(match[2], 10);
+            const day = parseInt(match[3], 10);
+            const hour = parseInt(match[4], 10);
+            const minute = parseInt(match[5], 10);
+            const second = parseInt(match[6], 10);
+
+            if (year < 0 || year > 9999 || month < 1 || month > 12 || hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59) {
+                errEl.textContent = '날짜/시간 범위가 올바르지 않습니다.';
+                resultEl.value = '';
+                return;
+            }
+
+            const lastDayDate = new Date(Date.UTC(year, month, 0));
+            const lastDayOfMonth = lastDayDate.getUTCDate();
+            if (day < 1 || day > lastDayOfMonth) {
+                errEl.textContent = `Invalid date: ${year}년 ${month}월은 ${lastDayOfMonth}일까지만 존재합니다.`;
+                resultEl.value = '';
+                return;
+            }
+
+            const date = new Date(0);
+            date.setUTCFullYear(year);
+            date.setUTCMonth(month - 1, day);
+            date.setUTCHours(hour, minute, second, 0);
+
+            if(isNaN(date.getTime()) || date.getUTCFullYear() !== year) {
+                errEl.textContent = '유효하지 않은 날짜/시간입니다.';
+                resultEl.value = '';
+                return;
+            }
+
+            const ms = date.getTime();
+            const sec = Math.floor(ms / 1000);
+            resultEl.value = `Sec: ${sec} / Ms: ${ms}`;
+        }
+
+        function setNowDate() {
+            const now = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            const formatted = `${now.getUTCFullYear()}-${pad(now.getUTCMonth()+1)}-${pad(now.getUTCDate())} ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
+            const dateInput = document.getElementById('date-input');
+            if(dateInput) {
+                dateInput.value = formatted;
+                convertDateToTimestamp();
+            }
+        }
+
+        function updateColors(source) {
+            const errEl = document.getElementById('color-err');
+            if(!errEl) return;
+            errEl.textContent = '';
+            let preview = document.getElementById('color-preview');
+            try {
+                let r=0, g=0, b=0;
+                if(source === 'hex') {
+                    let hexEl = document.getElementById('col-hex');
+                    if(!hexEl) return;
+                    let hex = hexEl.value.trim();
+                    const hexRegex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+                    if (!hexRegex.test(hex)) {
+                        errEl.textContent = 'Invalid HEX (#RGB 또는 #RRGGBB)';
+                        return;
+                    }
+                    let cleanHex = hex.replace('#','');
+                    if(cleanHex.length === 3) cleanHex = cleanHex.split('').map(c=>c+c).join('');
+                    r = parseInt(cleanHex.substring(0,2), 16);
+                    g = parseInt(cleanHex.substring(2,4), 16);
+                    b = parseInt(cleanHex.substring(4,6), 16);
+                    
+                    const rgbField = document.getElementById('col-rgb');
+                    const hslField = document.getElementById('col-hsl');
+                    if(rgbField) rgbField.value = `rgb(${r}, ${g}, ${b})`;
+                    let hsl = rgbToHsl(r, g, b);
+                    if(hslField) hslField.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+                } else if(source === 'rgb') {
+                    let rgbEl = document.getElementById('col-rgb');
+                    if(!rgbEl) return;
+                    let rgb = rgbEl.value.trim();
+                    let match = rgb.match(/^rgb\s*\(\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*\)$/i);
+                    if(!match) { errEl.textContent = 'Invalid RGB format (예: rgb(255, 0, 0))'; return; }
+                    r = parseInt(match[1], 10); g = parseInt(match[2], 10); b = parseInt(match[3], 10);
+                    if(r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+                        errEl.textContent = 'Invalid RGB range (0 ~ 255)';
+                        return;
+                    }
+                    const hexField = document.getElementById('col-hex');
+                    const hslField = document.getElementById('col-hsl');
+                    if(hexField) hexField.value = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+                    let hsl = rgbToHsl(r, g, b);
+                    if(hslField) hslField.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+                } else if(source === 'hsl') {
+                    let hslEl = document.getElementById('col-hsl');
+                    if(!hslEl) return;
+                    let hslStr = hslEl.value.trim();
+                    let match = hslStr.match(/^hsl\s*\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)%\s*,\s*(-?[\d.]+)%\s*\)$/i);
+                    if(!match) { errEl.textContent = 'Invalid HSL format (예: hsl(120, 50%, 50%))'; return; }
+                    let h = parseFloat(match[1]), s = parseFloat(match[2]), l = parseFloat(match[3]);
+                    
+                    if (s < 0 || s > 100 || l < 0 || l > 100) {
+                        errEl.textContent = 'Invalid HSL range (S/L: 0~100)';
+                        return;
+                    }
+
+                    h = h % 360;
+                    if (h < 0) h += 360;
+
+                    let rgbObj = hslToRgb(h, s, l);
+                    r = rgbObj.r; g = rgbObj.g; b = rgbObj.b;
+                    const hexField = document.getElementById('col-hex');
+                    const rgbField = document.getElementById('col-rgb');
+                    if(hexField) hexField.value = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+                    if(rgbField) rgbField.value = `rgb(${r}, ${g}, ${b})`;
+                }
+                if(preview) preview.style.backgroundColor = `rgb(${r},${g},${b})`;
+            } catch(e) { 
+                errEl.textContent = 'Color Error'; 
+            }
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; } else {
+                let d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function hslToRgb(h, s, l) {
+            s /= 100; l /= 100;
+            let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0;
+            if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+            else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+            else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+            else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+            else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+            else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+            return { r: Math.round((r + m) * 255), g: Math.round((g + m) * 255), b: Math.round((b + m) * 255) };
+        }
+
+        function runRegex() {
+            const patternEl = document.getElementById('regex-pattern');
+            const flagsEl = document.getElementById('regex-flags');
+            const stringEl = document.getElementById('regex-string');
+            const errEl = document.getElementById('regex-err');
+            const statsEl = document.getElementById('regex-stats');
+            const outputEl = document.getElementById('regex-output');
+            const groupsContainer = document.getElementById('regex-groups-container');
+            
+            if(!patternEl || !flagsEl || !stringEl || !errEl || !statsEl || !outputEl || !groupsContainer) return;
+
+            const pattern = patternEl.value;
+            const flags = flagsEl.value.trim();
+            const str = stringEl.value;
+            
+            errEl.textContent = '';
+            if (!pattern) { 
+                outputEl.textContent = str; 
+                statsEl.value = '매칭 없음'; 
+                groupsContainer.innerHTML = '';
+                const placeholderDiv = document.createElement('div');
+                placeholderDiv.style.cssText = 'color:var(--text-muted); font-size:0.85rem;';
+                placeholderDiv.textContent = '매칭 결과가 여기에 그룹별로 표시됩니다.';
+                groupsContainer.appendChild(placeholderDiv);
+                return; 
+            }
+
+            try {
+                const validFlagsSet = new Set(['g', 'i', 'm', 's', 'u', 'y', 'd', 'v']);
+                let flagChars = flags.split('');
+                if (new Set(flagChars).size !== flagChars.length) {
+                    throw new Error('중복된 플래그가 존재합니다.');
+                }
+                for (let f of flagChars) {
+                    if (!validFlagsSet.has(f)) {
+                        throw new Error(`지원하지 않는 플래그(${f})입니다.`);
+                    }
+                }
+
+                if (flags.includes('u') && flags.includes('v')) {
+                    throw new Error('u와 v 플래그는 동시에 사용할 수 없습니다.');
+                }
+
+                if (flags.includes('v')) {
+                    try {
+                        new RegExp('^[a]$', 'v');
+                    } catch (e) {
+                        throw new Error('이 브라우저에서는 v 플래그를 지원하지 않습니다.');
+                    }
+                }
+
+                if (flags.includes('d')) {
+                    try {
+                        new RegExp('a', 'd');
+                    } catch (e) {
+                        throw new Error('이 브라우저에서는 d 플래그를 지원하지 않습니다.');
+                    }
+                }
+
+                const regex = new RegExp(pattern, flags);
+                let count = 0;
+                let matchesList = [];
+                let match;
+                let maxIterations = 10000;
+
+                if (regex.global || regex.sticky) {
+                    while ((match = regex.exec(str)) !== null) {
+                        count++;
+                        if (count > maxIterations) {
+                            matchesList.push({ match: '무한 루프 방지: 최대 매칭 횟수 초과', index: 0, indices: null, groups: [] });
+                            break;
+                        }
+                        matchesList.push({
+                            match: match[0],
+                            index: match.index,
+                            indices: match.indices,
+                            groups: match.slice(1)
+                        });
+                        if (match[0].length === 0) {
+                            regex.lastIndex++;
+                        }
+                        if (regex.sticky && regex.lastIndex >= str.length) {
+                            break;
+                        }
+                    }
+                } else {
+                    match = regex.exec(str);
+                    if (match !== null) {
+                        count = 1;
+                        matchesList.push({
+                            match: match[0],
+                            index: match.index,
+                            indices: match.indices,
+                            groups: match.slice(1)
+                        });
+                    }
+                }
+
+                outputEl.innerHTML = '';
+                groupsContainer.innerHTML = '';
+
+                if (matchesList.length === 0) {
+                    outputEl.textContent = str;
+                    statsEl.value = '총 0개 매칭됨';
+                    const noMatchDiv = document.createElement('div');
+                    noMatchDiv.style.cssText = 'color:var(--text-muted); font-size:0.85rem;';
+                    noMatchDiv.textContent = '일치하는 항목이 없습니다.';
+                    groupsContainer.appendChild(noMatchDiv);
+                    return;
+                }
+
+                let lastIdx = 0;
+                let fragment = document.createDocumentFragment();
+
+                matchesList.forEach((m, mIdx) => {
+                    if (m.index > lastIdx) {
+                        fragment.appendChild(document.createTextNode(str.substring(lastIdx, m.index)));
+                    }
+                    let mark = document.createElement('mark');
+                    mark.style.background = 'var(--highlight-bg)';
+                    mark.style.padding = '0 2px';
+                    mark.style.borderRadius = '2px';
+                    mark.textContent = m.match;
+                    fragment.appendChild(mark);
+
+                    lastIdx = m.index + m.match.length;
+
+                    let groupCard = document.createElement('div');
+                    groupCard.className = 'group-card';
+                    
+                    let strong = document.createElement('strong');
+                    strong.textContent = `Match ${mIdx + 1}`;
+                    groupCard.appendChild(strong);
+                    groupCard.appendChild(document.createTextNode(': '));
+
+                    let codeMatch = document.createElement('code');
+                    codeMatch.textContent = m.match;
+                    groupCard.appendChild(codeMatch);
+
+                    if (m.groups && m.groups.length > 0) {
+                        m.groups.forEach((g, gIdx) => {
+                            let gText = (g !== undefined) ? String(g) : 'undefined';
+                            let subDiv = document.createElement('div');
+                            subDiv.style.cssText = 'margin-left: 15px; margin-top: 4px;';
+                            subDiv.textContent = `Capture Group ${gIdx + 1}: `;
+                            let codeGroup = document.createElement('code');
+                            codeGroup.textContent = gText;
+                            subDiv.appendChild(codeGroup);
+
+                            if (m.indices && m.indices[gIdx + 1]) {
+                                let idxSpan = document.createElement('span');
+                                idxSpan.style.cssText = 'margin-left: 10px; color: var(--text-muted); font-size: 0.8rem;';
+                                idxSpan.textContent = `[indices: ${m.indices[gIdx + 1][0]}, ${m.indices[gIdx + 1][1]}]`;
+                                subDiv.appendChild(idxSpan);
+                            }
+
+                            groupCard.appendChild(subDiv);
+                        });
+                    } else {
+                        let noneDiv = document.createElement('div');
+                        noneDiv.style.cssText = 'margin-left: 15px; margin-top: 4px; color:var(--text-muted);';
+                        noneDiv.textContent = 'Capture Groups: None';
+                        groupCard.appendChild(noneDiv);
+                    }
+                    groupsContainer.appendChild(groupCard);
+                });
+
+                if (lastIdx < str.length) {
+                    fragment.appendChild(document.createTextNode(str.substring(lastIdx)));
+                }
+
+                outputEl.appendChild(fragment);
+                statsEl.value = `총 ${count}개 매칭됨`;
+
+            } catch(e) { 
+                errEl.textContent = 'Invalid regular expression: ' + e.message; 
+                statsEl.value = '오류 발생'; 
+                outputEl.textContent = str;
+                let errDiv = document.createElement('div');
+                errDiv.style.cssText = 'color:var(--error-color); font-size:0.85rem;';
+                errDiv.textContent = '정규식 오류 또는 잘못된 플래그';
+                groupsContainer.appendChild(errDiv);
+            }
+        }
+
+        function decodeJWT() {
+            const tokenEl = document.getElementById('jwt-input');
+            const errEl = document.getElementById('jwt-err');
+            const hEl = document.getElementById('jwt-header');
+            const pEl = document.getElementById('jwt-payload');
+            const sEl = document.getElementById('jwt-signature');
+            const sigStatusEl = document.getElementById('jwt-sig-status');
+
+            if(!tokenEl || !errEl) return;
+
+            const token = tokenEl.value.trim();
+            errEl.textContent = '';
+            
+            if (!token) { 
+                if(hEl) hEl.value = ''; 
+                if(pEl) pEl.value = ''; 
+                if(sEl) sEl.value = '';
+                if(sigStatusEl) sigStatusEl.textContent = '(not verified)';
+                return; 
+            }
+
+            const parts = token.split('.');
+            if (parts.length !== 3) { 
+                errEl.textContent = 'Invalid JWT format (HEADER.PAYLOAD.SIGNATURE 정확히 3개 파트여야 합니다)'; 
+                if(hEl) hEl.value = ''; 
+                if(pEl) pEl.value = ''; 
+                if(sEl) sEl.value = '';
+                if(sigStatusEl) sigStatusEl.textContent = '(not verified)';
+                return; 
+            }
+
+            const base64UrlRegex = /^[A-Za-z0-9\-_]+$/;
+            
+            if (!base64UrlRegex.test(parts[0]) || parts[0].length % 4 === 1) {
+                errEl.textContent = 'Invalid JWT: Header 파트가 올바르지 않습니다.';
+                if(hEl) hEl.value = ''; if(pEl) pEl.value = ''; if(sEl) sEl.value = '';
+                return;
+            }
+            if (!base64UrlRegex.test(parts[1]) || parts[1].length % 4 === 1) {
+                errEl.textContent = 'Invalid JWT: Payload 파트가 올바르지 않습니다.';
+                if(hEl) hEl.value = ''; if(pEl) pEl.value = ''; if(sEl) sEl.value = '';
+                return;
+            }
+
+            let decodedHeaderStr;
+            try {
+                decodedHeaderStr = decodeBase64UrlSecure(parts[0]);
+            } catch (e) {
+                errEl.textContent = 'Invalid JWT: Header 디코딩 실패';
+                if(hEl) hEl.value = ''; if(pEl) pEl.value = ''; if(sEl) sEl.value = '';
+                return;
+            }
+
+            let headerObj;
+            try {
+                headerObj = JSON.parse(decodedHeaderStr);
+            } catch(err) {
+                errEl.textContent = 'Invalid JWT: Header가 올바른 JSON 형식이 아닙니다.';
+                if(hEl) hEl.value = ''; if(pEl) pEl.value = ''; if(sEl) sEl.value = '';
+                return;
+            }
+
+            if (!headerObj || typeof headerObj !== 'object' || Array.isArray(headerObj) || typeof headerObj.alg !== 'string') {
+                errEl.textContent = 'Invalid JWT: Header에 올바른 문자열 형식의 "alg" 필드가 없습니다.';
+                if(hEl) hEl.value = ''; if(pEl) pEl.value = ''; if(sEl) sEl.value = '';
+                return;
+            }
+
+            const algValue = headerObj.alg.toLowerCase();
+            const isNoneAlg = (algValue === 'none');
+
+            if (isNoneAlg) {
+                if (parts[2] !== '') {
+                    errEl.textContent = 'Invalid JWT: alg이 "none"인 경우 Signature 파트는 비어 있어야 합니다.';
+                    if(hEl) hEl.value = ''; if(pEl) pEl.value = ''; if(sEl) sEl.value = '';
+                    return;
+                }
+            } else {
+                if (parts[2] === '') {
+                    errEl.textContent = `Invalid JWT: alg이 "${headerObj.alg}"인 경우 Signature 파트가 비어 있을 수 없습니다.`;
+                    if(hEl) hEl.value = ''; if(pEl) pEl.value = ''; if(sEl) sEl.value = '';
+                    return;
+                }
+                if (!base64UrlRegex.test(parts[2]) || parts[2].length % 4 === 1) {
+                    errEl.textContent = 'Invalid JWT: Signature 파트가 올바르지 않습니다.';
+                    if(hEl) hEl.value = ''; if(pEl) pEl.value = ''; if(sEl) sEl.value = '';
+                    return;
+                }
+            }
+
+            try {
+                const decodedPayloadStr = decodeBase64UrlSecure(parts[1]);
+                let payloadObj;
+                try {
+                    payloadObj = JSON.parse(decodedPayloadStr);
+                } catch(err) {
+                    throw new Error('Invalid JWT: Payload가 올바른 JSON 형식이 아닙니다.');
+                }
+
+                if(hEl) hEl.value = JSON.stringify(headerObj, null, 2);
+                if(pEl) pEl.value = JSON.stringify(payloadObj, null, 2);
+                if(sEl) sEl.value = parts[2];
+                if(sigStatusEl) sigStatusEl.textContent = '(not verified)';
+            } catch (e) { 
+                errEl.textContent = e.message; 
+                if(hEl) hEl.value = ''; 
+                if(pEl) pEl.value = ''; 
+                if(sEl) sEl.value = '';
+            }
+        }
+
+        function decodeBase64UrlSecure(base64Url) {
+            if (base64Url.length % 4 === 1) {
+                throw new Error('Invalid Base64URL length');
+            }
+            const strictBase64UrlRegex = /^[A-Za-z0-9\-_]*$/;
+            if (!strictBase64UrlRegex.test(base64Url)) {
+                throw new Error('Invalid Base64URL format');
+            }
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            while (base64.length % 4) { base64 += '='; }
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+            return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+        }
+
+        function copyOutput(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el || !el.value) return;
+            copyTextToClipboard(el.value);
+        }
+
+        function copyField(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el || !el.value) return;
+            copyTextToClipboard(el.value);
+        }
+
+        function downloadOutput(elementId, filename) {
+            const el = document.getElementById(elementId);
+            if (!el || !el.value) return;
+            const blob = new Blob([el.value], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; 
+            a.download = filename;
+            document.body.appendChild(a); 
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
